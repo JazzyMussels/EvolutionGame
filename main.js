@@ -93,9 +93,9 @@ function create ()
     // evolve-bar
     this.evoBarShell = this.add.image(295, 40, 'outer_shell')
     this.evoBarShell.setScale(1.8)
-    this.evoBatInterior = this.add.image(66, 21, 'inner_bar').setOrigin(0, 0)
-    this.evoBatInterior.setScale(1.8)
-    this.evoBatInterior.displayWidth = 0;
+    this.evoBarInterior = this.add.image(66, 21, 'inner_bar').setOrigin(0, 0)
+    this.evoBarInterior.setScale(1.8)
+    this.evoBarInterior.displayWidth = 0;
     
     
 
@@ -175,17 +175,13 @@ function create ()
 //makes a variable of "this" when inside functions
   scene = this
    //bugs function
-  makeBugs = () => {
-    var bugs = scene.physics.add.group({
+
+     bugs = this.physics.add.group({
     key: 'bug',
-    // repeat: 4,
+     repeat: 4,
     setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
 }); 
-bugs.children.iterate(function(bug){
-    bug.setCollideWorldBounds(true)
-    bug.setScale(0.5,0.5)
-    bug.setBounce(1,0)
-})
+
 this.physics.add.collider(bugs, gameBoundaries)
  this.physics.add.collider(bugs, cloudPlatforms)
  this.anims.create({
@@ -200,11 +196,57 @@ this.anims.create({
     frameRate: 10,
     repeat: -1
 });
-bugs.setVelocityX(-160)
 
-return bugs
+bugs.children.iterate(function(bug){
+    bug.setCollideWorldBounds(true)
+    bug.setScale(0.5,0.5)
+    bug.setBounce(1,0)
+    bug.setVelocityX(-160)
+})
+
+console.log(this)
+if (activeAvatar.egg){
+    this.time.addEvent({
+        delay: 5000,
+        callback: createBug, // End callback for adding enemies
+        callbackScope: this,
+        loop: true
+    })}
+else if (activeAvatar.chicken){
+    this.time.addEvent({
+        delay: 3000,
+        callback: createBug, // End callback for adding enemies
+        callbackScope: this,
+        loop: true
+    })}
+else if (activeAvatar.raptor){
+    this.time.addEvent({
+        delay: 1000,
+        callback: createBug, // End callback for adding enemies
+        callbackScope: this,
+        loop: true
+    })}
+else if (activeAvatar.chicken){
+    this.time.addEvent({
+        delay: 3000,
+        callback: createBug, // End callback for adding enemies
+        callbackScope: this,
+        loop: true
+    })}
+function createBug(){
+    var x = Phaser.Math.Between(0, 900)
+    for (var i = 0; i < 5; i++) {
+		var x = Phaser.Math.RND.between(0, 800);
+        var bug = bugs.create(x, 16, 'bug')
+        bug.setCollideWorldBounds(true)
+        bug.setScale(0.5,0.5)
+        bug.setBounce(1,0)
+        bug.setVelocityX(-160)
+	}
+    ;
+    
+   
 }
-bugs = makeBugs()
 
 
     //chicken
@@ -562,23 +604,24 @@ if (activeAvatar.raptor){
 
 
 
-    this.physics.add.collider(eggPlayer, bugs, eggBugHit, null, this);
+this.physics.add.collider(eggPlayer, bugs, eggBugHit, null, this);
 
 function eggBugHit(eggPlayer, bug){
     if (bug.body.touching.up){
-        this.evoBatInterior.displayWidth += 30
+        this.evoBarInterior.displayWidth += 457/5
         score += 10;
     scoreText.setText(`${score}`);
     bug.disableBody(true, true)}
     else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
-            if ( this.evoBatInterior.displayWidth >= 15) {
-                this.evoBatInterior.displayWidth -= 15
+            if ( this.evoBarInterior.displayWidth >= 15) {
+                this.evoBarInterior.displayWidth -= 15
             }
         score -= 10;
         scoreText.setText(`${score}`);
         }
 
-     if (bugs.countActive(true) === 0){
+    if (this.evoBarInterior.displayWidth >= 457){
+        this.evoBarInterior.displayWidth = 0
         
         activeAvatar.egg = false
         activeAvatar.chicken = true
@@ -590,7 +633,7 @@ function eggBugHit(eggPlayer, bug){
      }
     }
     function becomeChicken(player){
-       bugs = makeBugs()
+       
         player.setTexture( "chicken")
         console.log(player.texture.key)
         chickenPlayer.enableBody(true, eggPlayer.x, eggPlayer.y,true, true)
@@ -602,19 +645,20 @@ function eggBugHit(eggPlayer, bug){
 
     function chickenBugHit(chickenPlayer, bug) {
         if(bug.body.touching.up || cursors.space.isDown){
-            this.evoBatInterior.displayWidth += 30
+            this.evoBarInterior.displayWidth += 457/7
             score += 10;
             scoreText.setText(`${score}`);
         }
             else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
-                if ( this.evoBatInterior.displayWidth >= 15) {
-                    this.evoBatInterior.displayWidth -= 15
+                if ( this.evoBarInterior.displayWidth >= 15) {
+                    this.evoBarInterior.displayWidth -= 15
                 }
             score -= 10;
             scoreText.setText(`${score}`);
             }
         bug.disableBody(true,true)
-        if (bugs.countActive(true) === 0){
+        if (this.evoBarInterior.displayWidth >= 457){
+            this.evoBarInterior.displayWidth = 0
     
             activeAvatar.chicken = false
             activeAvatar.raptor = true
@@ -625,7 +669,7 @@ function eggBugHit(eggPlayer, bug){
         }
 
         function becomeRaptor(chickenPlayer){
-            bugs = makeBugs()
+            
             chickenPlayer.setTexture( "raptor")
             raptorPlayer.enableBody(true, chickenPlayer.x, chickenPlayer.y,true, true)
             chickenPlayer.disableBody(true,true)
@@ -634,19 +678,22 @@ function eggBugHit(eggPlayer, bug){
 
         function raptorBugHit(raptorPlayer, bug){
             if(bug.body.touching.up){
-                this.evoBatInterior.displayWidth += 30
+                this.evoBarInterior.displayWidth += 457/10
                 score += 10;
                 scoreText.setText(`${score}`)
                 bug.disableBody(true, true)
              } else if  (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
-                if ( this.evoBatInterior.displayWidth >= 15) {
-                    this.evoBatInterior.displayWidth -= 15
+                if ( this.evoBarInterior.displayWidth >= 15) {
+                    this.evoBarInterior.displayWidth -= 15
                 }
                     score -= 10;
                     scoreText.setText(`${score}`);
-                    }
+                }
             
-            if (bugs.countActive(true) === 0){
+
+            
+            if (this.evoBarInterior.displayWidth >= 457){
+                this.evoBarInterior.displayWidth = 0
     
                 activeAvatar.raptor = false
                 activeAvatar.king = true
@@ -658,7 +705,7 @@ function eggBugHit(eggPlayer, bug){
         }
 
         function becomeKing(raptorPlayer){
-            bugs = makeBugs();
+            ;
             console.log(raptorPlayer.y)
             //corrected the king falling through the floor when changing from raptor
             let y = (raptorPlayer.y >= 669) ? 661.4 : raptorPlayer.y
@@ -671,13 +718,13 @@ function eggBugHit(eggPlayer, bug){
 
         function kingBugHit(kingPlayer, bug){
             if (bug.body.touching.up){
-                this.evoBatInterior.displayWidth += 30
+                this.evoBarInterior.displayWidth += 30
                 score += 10;
             scoreText.setText(`${score}`);
             bug.disableBody(true, true)}
             else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
-                if ( this.evoBatInterior.displayWidth >= 15) {
-                    this.evoBatInterior.displayWidth -= 15
+                if ( this.evoBarInterior.displayWidth >= 15) {
+                    this.evoBarInterior.displayWidth -= 15
                 }
                 score -= 10;
                 scoreText.setText(`${score}`);
