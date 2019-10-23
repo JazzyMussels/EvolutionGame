@@ -47,3 +47,46 @@ function BugHit(player) {
         }
 
     }
+
+
+
+    function collectBinary(player, binaryTokens) {
+        binaryTokens.disableBody(true, true)
+        score += 10;
+        scoreText.setText(`${score}`);
+        this.evoBarInterior.displayWidth += 15
+
+      } 
+
+
+
+    makeTokens = () => {
+        var tokens = scene.physics.add.group({
+        key: 'binary',
+        repeat: 2,
+        setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
+    }); 
+    var tokens10 = scene.physics.add.group({
+        key: 'binary10',
+        repeat: 2,
+        setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
+    }); 
+    tokens.children.iterate(function(token){
+        token.setCollideWorldBounds(true)
+        binaryTokens.setScale(.3)
+        token.setBounce(1,0)
+    })
+
+    tokens10.children.iterate(function(token){
+        token.setCollideWorldBounds(true)
+        binaryTokens10.setScale(.3)
+        token.setBounce(1,0)
+    })
+    this.physics.add.collider(tokens, cloudPlatforms)
+    this.physics.add.collider(tokens, gameBoundaries)
+    this.physics.add.collider(tokens10, cloudPlatforms)
+    this.physics.add.collider(tokens10, gameBoundaries)
+    return tokens 
+    }
+  
+    
