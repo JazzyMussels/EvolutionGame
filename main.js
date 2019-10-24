@@ -20,7 +20,6 @@ var config = {
 
 var game = new Phaser.Game(config);
 var bugs;
-var makeBugs;
 var gameBoundaries;
 var cloudPlatforms;
 var chickenPlayer;
@@ -205,6 +204,8 @@ bugs.children.iterate(function(bug){
 })
 
 console.log(this)
+if((bugs.countActive(true) < 10)){
+    console.log(bugs.countActive(true))
 if (activeAvatar.egg){
     this.time.addEvent({
         delay: 5000,
@@ -226,26 +227,24 @@ else if (activeAvatar.raptor){
         callbackScope: this,
         loop: true
     })}
-else if (activeAvatar.chicken){
+else if (activeAvatar.king){
     this.time.addEvent({
-        delay: 3000,
+        delay: 500,
         callback: createBug, // End callback for adding enemies
         callbackScope: this,
         loop: true
     })}
+}
 function createBug(){
-    var x = Phaser.Math.Between(0, 900)
-    for (var i = 0; i < 5; i++) {
-		var x = Phaser.Math.RND.between(0, 800);
+    for (var i = 0; i < 3; i++) {
+		var x = Phaser.Math.RND.between(0, 900);
         var bug = bugs.create(x, 16, 'bug')
         bug.setCollideWorldBounds(true)
         bug.setScale(0.5,0.5)
         bug.setBounce(1,0)
         bug.setVelocityX(-160)
 	}
-    ;
-    
-   
+    ; 
 }
 
 
@@ -412,14 +411,28 @@ function createBug(){
     // });
 
     // binary
-    binaryTokens = this.physics.add.sprite(400, 650, 'binary')
-    binaryTokens10 = this.physics.add.sprite(460, 650, 'binary10')
-    binaryTokens.setScale(.3)
-    binaryTokens10.setScale(.3)
-    binaryTokens.setBounce(0);
-    binaryTokens10.setBounce(0);
-    binaryTokens.setCollideWorldBounds(true)
-    binaryTokens10.setCollideWorldBounds(true)
+    binaryTokens = this.physics.add.group({
+        key: 'binary',
+        setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70}
+    }); 
+    binaryTokens10 = this.physics.add.group({
+        key: 'binary10',
+        setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70}
+    }); 
+
+    // binaryTokens = this.physics.add.sprite(400, 650, 'binary')
+    // binaryTokens10 = this.physics.add.sprite(460, 650, 'binary10')
+    binaryTokens.children.iterate(function(token){
+       token.setScale(.3);
+        token.setBounce(0);
+        token.setCollideWorldBounds(true)
+    })
+    binaryTokens10.children.iterate(function(token){
+        token.setScale(.3);
+         token.setBounce(0);
+         token.setCollideWorldBounds(true)
+     })
+   
 
     this.physics.add.collider(binaryTokens, cloudPlatforms)
     this.physics.add.collider(binaryTokens, gameBoundaries)
@@ -584,11 +597,18 @@ if (activeAvatar.raptor){
             
             raptorPlayer.setVelocityX(0);
             raptorPlayer.anims.play('roarleft', true);
+            bugs.children.iterate(function(bug){
+                bug.setVelocity(0)
+                
+            })
         }
         if (lastCursor === "right"){
             raptorPlayer.setVelocityX(0);
             raptorPlayer.anims.play('roarright', true);
         }
+        bugs.children.iterate(function(bug){
+            bug.setVelocity(0)
+        })
     }
     else if (lastCursor === "left")
     {
@@ -610,36 +630,48 @@ if (activeAvatar.raptor){
     }
 
     makeTokens = () => {  
-        var tokens = scene.physics.add.group({
-        key: 'binary',
-        repeat: 2,
-        setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
-    }); 
-    var tokens10 = scene.physics.add.group({
-        key: 'binary10',
-        repeat: 2,
-        setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
-    }); 
-    tokens.children.iterate(function(token){
-        token.setCollideWorldBounds(true)
-        token.setScale(0.3, 0.3)
-        // this.physics.add.collider(tokens, cloudPlatforms)
-        // this.physics.add.collider(tokens, gameBoundaries)
-        token.setBounce(1,0)
-    })
+        for (var i = 0; i < 2; i++) {
+            var x = Phaser.Math.Between(0, 800);
+            var x2 = Phaser.Math.Between(0, 800);
+            var tokens = binaryTokens.create(x, 16, 'binary');
+            var tokens10 = binaryTokens10.create(x2, 16,'binary10');
 
-    tokens10.children.iterate(function(token){
-        token.setCollideWorldBounds(true)
-        // this.physics.add.collider(tokens10, cloudPlatforms)
-        // this.physics.add.collider(tokens10, gameBoundaries)
-        token.setScale(0.3, 0.3)
-        token.setBounce(1,0)
-    })
-    this.physics.add.collider(tokens, cloudPlatforms)
-    this.physics.add.collider(tokens, gameBoundaries)
-    this.physics.add.collider(tokens10, cloudPlatforms)
-    this.physics.add.collider(tokens10, gameBoundaries)
+    //     var tokens = scene.physics.add.group({
+    //     key: 'binary',
+    //     repeat: 2,
+    //     setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
+    // }); 
+    // var tokens10 = scene.physics.add.group({
+    //     key: 'binary10',
+    //     repeat: 2,
+    //     setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
+    // }); 
+        
+        tokens.setScale(0.3);
+        tokens10.setScale(0.3);
+        tokens10.setBounce(1,0);
+        tokens.setBounce(1,0);
+        tokens10.setCollideWorldBounds(true);
+        tokens.setCollideWorldBounds(true);
+        this.physics.add.collider(tokens, cloudPlatforms);
+        this.physics.add.collider(tokens, gameBoundaries);
+         this.physics.add.collider(tokens10, cloudPlatforms);
+         this.physics.add.collider(tokens10, gameBoundaries);
+         
+         setTimeout(() => {
+            tokens.disableBody(true, true);
+          }, 1000)
+          setTimeout(() => {
+            tokens10.disableBody(true, true);
+          }, 1000)
+        
+    // this.physics.add.collider(tokens, cloudPlatforms)
+    // this.physics.add.collider(tokens, gameBoundaries)
+    // this.physics.add.collider(tokens10, cloudPlatforms)
+    // this.physics.add.collider(tokens10, gameBoundaries)
     }
+    
+}
 
 this.physics.add.collider(eggPlayer, bugs, eggBugHit, null, this);
 
@@ -686,6 +718,7 @@ function eggBugHit(eggPlayer, bug){
             score += 10;
             scoreText.setText(`${score}`);
             makeTokens()
+            bug.disableBody(true,true)
         }
             else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
                 if ( this.evoBarInterior.displayWidth >= 15) {
@@ -694,7 +727,7 @@ function eggBugHit(eggPlayer, bug){
             score -= 10;
             scoreText.setText(`${score}`);
             }
-        bug.disableBody(true,true)
+        
         if (this.evoBarInterior.displayWidth >= 457){
             this.evoBarInterior.displayWidth = 0
     
@@ -742,6 +775,16 @@ function eggBugHit(eggPlayer, bug){
                 }
             
         }
+        correctUnderBottom(eggPlayer)
+        correctUnderBottom(chickenPlayer)
+        correctUnderBottom(raptorPlayer)
+        correctUnderBottom(kingPlayer)
+//this function corrects for when the player gets pushed to underneath the bottom
+        function correctUnderBottom(player){
+            if (player.y>=669){
+                player.y = 661
+            }
+        }
 
         function becomeKing(raptorPlayer){
             ;
@@ -769,7 +812,9 @@ function eggBugHit(eggPlayer, bug){
                 score -= 10;
                 scoreText.setText(`${score}`);
                 }
-            bug.disableBody(true, true)
+            if (this.evoBarInterior.displayWidth >= 443){
+                this.evoBarInterior.displayWidth = 443
+            }
         }
 
         this.physics.add.overlap(eggPlayer, binaryTokens, collectBinary, null, this);
@@ -790,6 +835,10 @@ function eggBugHit(eggPlayer, bug){
           } 
 
           function collectBinary10(player, binaryTokens10) {
+            if (this.evoBarInterior.displayWidth >= 443){
+                this.evoBarInterior.displayWidth = 443
+                console.log(player.texture.key)
+            }
             binaryTokens10.disableBody(true, true)
             score += 10;
             scoreText.setText(`${score}`);
