@@ -27,6 +27,14 @@ var score = 0;
 var activeAvatar = {egg: false, chicken: false, raptor: false, king: false}
 var lastCursor;
 var scene;
+var cake;
+var coins; 
+var eggSound; 
+var gobble; 
+var levelDown; 
+var levelUp; 
+var scream; 
+var squish; 
 
 
 function preload ()
@@ -58,10 +66,20 @@ this.load.spritesheet('egg', 'assets/eggsprite.png', { frameWidth: 76, frameHeig
 this.load.spritesheet('chicken', 'assets/chickensprite.png', { frameWidth: 82, frameHeight: 60 })
 this.load.spritesheet('raptor', 'assets/raptorsprite.png', { frameWidth: 186, frameHeight: 129 })
 this.load.spritesheet('king', 'assets/kingsprite.png', { frameWidth: 77, frameHeight: 88 })
-this.load.spritesheet('binary', 'assets/binarysprite.png', { frameWidth: 76, frameHeight: 88 })
-this.load.spritesheet('binary10', 'assets/binarysprite10.png', { frameWidth: 76, frameHeight: 88 })
+this.load.image('binary', 'assets/binarysprite.png', { frameWidth: 76, frameHeight: 88 })
 this.load.spritesheet('cake', 'assets/cakesprite.png', { frameWidth: 200, frameHeight: 211 })
 this.load.spritesheet('bug', 'assets/bugsprite.png', { frameWidth: 80, frameHeight: 60 });
+
+//sound
+this.load.audio('soundtrack', 'assets/sounds/soundtrack.mp3')
+this.load.audio('cake', 'assets/sounds/cake.mp3')
+this.load.audio('coins', 'assets/sounds/coins.mp3')
+this.load.audio('eggSound', 'assets/sounds/egg.mp3')
+this.load.audio('gobble', 'assets/sounds/gobble.mp3')
+this.load.audio('level_down', 'assets/sounds/level_down.mp3')
+this.load.audio('level_up', 'assets/sounds/level_up.mp3')
+this.load.audio('scream', 'assets/sounds/scream.mp3')
+this.load.audio('squish', 'assets/sounds/squish.mp3')
 }
 
 
@@ -77,7 +95,21 @@ function create ()
     this.kingScreen = this.add.image(1302, 580, 'kingscreen')
     // this.restartScreen = this.add.image(1302, 480, 'restartscreen')
     
-    
+    //soundtrack
+    let music = this.sound.add('soundtrack')
+    music.setLoop(true);
+    music.play()
+
+    //sound-effects
+    cake = this.sound.add('cake')
+    coins = this.sound.add('coins')
+    eggSound = this.sound.add('eggSound')
+    gobble = this.sound.add('gobble')
+    levelDown = this.sound.add('level_down')
+    levelUp = this.sound.add('level_up')
+    scream = this.sound.add('scream')
+    squish = this.sound.add('squish')
+
 
     //  background
     this.background = this.add.image(0, 0, 'background');
@@ -204,11 +236,11 @@ bugs.children.iterate(function(bug){
 })
 
 console.log(this)
-if((bugs.countActive(true) < 10)){
+// if((bugs.countActive(true) < 10)){
     console.log(bugs.countActive(true))
 if (activeAvatar.egg){
     this.time.addEvent({
-        delay: 5000,
+        delay: 4000,
         callback: createBug, // End callback for adding enemies
         callbackScope: this,
         loop: true
@@ -222,21 +254,21 @@ else if (activeAvatar.chicken){
     })}
 else if (activeAvatar.raptor){
     this.time.addEvent({
-        delay: 1000,
+        delay: 2000,
         callback: createBug, // End callback for adding enemies
         callbackScope: this,
         loop: true
     })}
 else if (activeAvatar.king){
     this.time.addEvent({
-        delay: 500,
+        delay: 700,
         callback: createBug, // End callback for adding enemies
         callbackScope: this,
         loop: true
-    })}
+    })
 }
 function createBug(){
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 2; i++) {
 		var x = Phaser.Math.RND.between(0, 900);
         var bug = bugs.create(x, 16, 'bug')
         bug.setCollideWorldBounds(true)
@@ -246,9 +278,6 @@ function createBug(){
 	}
     ; 
 }
-
-
-
 
     //chicken
       chickenPlayer = this.physics.add.sprite(100, 650, 'chicken')
@@ -415,30 +444,21 @@ function createBug(){
         key: 'binary',
         setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70}
     }); 
-    binaryTokens10 = this.physics.add.group({
-        key: 'binary10',
-        setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70}
-    }); 
-
-    // binaryTokens = this.physics.add.sprite(400, 650, 'binary')
-    // binaryTokens10 = this.physics.add.sprite(460, 650, 'binary10')
+   
     binaryTokens.children.iterate(function(token){
        token.setScale(.3);
-        token.setBounce(0);
+        token.setBounce(0.3);
         token.setCollideWorldBounds(true)
+        setTimeout(() => {
+            token.disableBody(true, true);
+          }, 4000)
     })
-    binaryTokens10.children.iterate(function(token){
-        token.setScale(.3);
-         token.setBounce(0);
-         token.setCollideWorldBounds(true)
-     })
+    
    
 
     this.physics.add.collider(binaryTokens, cloudPlatforms)
     this.physics.add.collider(binaryTokens, gameBoundaries)
-    this.physics.add.collider(binaryTokens10, cloudPlatforms)
-    this.physics.add.collider(binaryTokens10, gameBoundaries)
-
+   
 
 
     cursors = this.input.keyboard.createCursorKeys();
@@ -483,6 +503,7 @@ if (activeAvatar.egg) {
 
      if (cursors.up.isDown && eggPlayer.body.touching.down )
      {
+        eggSound.play()
          eggPlayer.setVelocityY(-400);
      }
 }
@@ -515,6 +536,7 @@ if (activeAvatar.egg) {
          lastCursor = "right"
      }
      else if (cursors.space.isDown){
+         gobble.play()
          if (lastCursor === "right"){
         chickenPlayer.setVelocityX(520)
      chickenPlayer.anims.play('chickright', true)
@@ -595,6 +617,7 @@ if (activeAvatar.raptor){
     }
 
     else if(cursors.space.isDown){
+        scream.play()
         if (lastCursor === "left"){
             
             raptorPlayer.setVelocityX(0);
@@ -633,45 +656,38 @@ if (activeAvatar.raptor){
 
     makeTokens = () => {  
         for (var i = 0; i < 2; i++) {
-            var x = Phaser.Math.Between(0, 800);
-            var x2 = Phaser.Math.Between(0, 800);
-            var tokens = binaryTokens.create(x, 16, 'binary');
-            var tokens10 = binaryTokens10.create(x2, 16,'binary10');
-
-    //     var tokens = scene.physics.add.group({
-    //     key: 'binary',
-    //     repeat: 2,
-    //     setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
-    // }); 
-    // var tokens10 = scene.physics.add.group({
-    //     key: 'binary10',
-    //     repeat: 2,
-    //     setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
-    // }); 
-        
-        tokens.setScale(0.3);
-        tokens10.setScale(0.3);
-        tokens10.setBounce(1,0);
-        tokens.setBounce(1,0);
-        tokens10.setCollideWorldBounds(true);
-        tokens.setCollideWorldBounds(true);
-        this.physics.add.collider(tokens, cloudPlatforms);
-        this.physics.add.collider(tokens, gameBoundaries);
-         this.physics.add.collider(tokens10, cloudPlatforms);
-         this.physics.add.collider(tokens10, gameBoundaries);
+            if (i === 0){
+                var x = Phaser.Math.Between(0, 800);
+                var tokens = binaryTokens.create(x, 16, 'binary');
+                tokens.setScale(0.3);
+       
+                tokens.setBounce(1,0);
+                tokens.setCollideWorldBounds(true);
+                this.physics.add.collider(tokens, cloudPlatforms);
+                this.physics.add.collider(tokens, gameBoundaries);
+               
+                 setTimeout(() => {
+                    tokens.disableBody(true, true);
+                  }, 8000)
+            }
+            else {
+                var x1 = Phaser.Math.Between(0, 800);
+                var tokens1 = binaryTokens.create(x1, 16, 'binary');
+                tokens1.setScale(0.3);
+       
+                tokens1.setBounce(1,0);
+                tokens1.setCollideWorldBounds(true);
+                this.physics.add.collider(tokens1, cloudPlatforms);
+                this.physics.add.collider(tokens1, gameBoundaries);
+               
+                 setTimeout(() => {
+                    tokens1.disableBody(true, true);
+                  }, 8000)
+                }
+            }
          
-         setTimeout(() => {
-            tokens.disableBody(true, true);
-          }, 1000)
-          setTimeout(() => {
-            tokens10.disableBody(true, true);
-          }, 1000)
         
-    // this.physics.add.collider(tokens, cloudPlatforms)
-    // this.physics.add.collider(tokens, gameBoundaries)
-    // this.physics.add.collider(tokens10, cloudPlatforms)
-    // this.physics.add.collider(tokens10, gameBoundaries)
-    }
+       
     
 }
 
@@ -679,19 +695,22 @@ this.physics.add.collider(eggPlayer, bugs, eggBugHit, null, this);
 
 function eggBugHit(eggPlayer, bug){
     if (bug.body.touching.up){
+        squish.play()
         this.evoBarInterior.displayWidth += 457/5
         score += 10;
     scoreText.setText(`${score}`);
     makeTokens()
     bug.disableBody(true, true)}
     else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
-            if ( this.evoBarInterior.displayWidth >= 15) {
-                this.evoBarInterior.displayWidth -= 15
-            }
+        levelDown.play()
         eggPlayer.setTint(0xff0000)  
         setTimeout(() => {
             eggPlayer.clearTint()
         }, 1000)  
+            if ( this.evoBarInterior.displayWidth >= 15) {
+                this.evoBarInterior.displayWidth -= 15
+            }
+        
         score -= 10;
         scoreText.setText(`${score}`);
         }
@@ -703,6 +722,7 @@ function eggBugHit(eggPlayer, bug){
         activeAvatar.chicken = true
         
         becomeChicken(eggPlayer)
+        levelUp.play()
         
         
      }
@@ -720,6 +740,7 @@ function eggBugHit(eggPlayer, bug){
 
     function chickenBugHit(chickenPlayer, bug) {
         if(bug.body.touching.up || cursors.space.isDown){
+            squish.play()
             this.evoBarInterior.displayWidth += 457/7
             score += 10;
             scoreText.setText(`${score}`);
@@ -727,6 +748,7 @@ function eggBugHit(eggPlayer, bug){
             bug.disableBody(true,true)
         }
         else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
+            levelDown.play()
             chickenPlayer.setTint(0xff0000)  
                     setTimeout(() => {
                         chickenPlayer.clearTint()
@@ -736,17 +758,18 @@ function eggBugHit(eggPlayer, bug){
                 scoreText.setText(`${score}`);
                 if (this.evoBarInterior.displayWidth <= 0){
                         becomeEgg(chickenPlayer)
+                       
                      }
             } 
         
         if (this.evoBarInterior.displayWidth >= 457){
-            this.evoBarInterior.displayWidth = 0
+            this.evoBarInterior.displayWidth = 30
     
             activeAvatar.chicken = false
             activeAvatar.raptor = true
             
             becomeRaptor(chickenPlayer)    
-    
+            levelUp.play()
             }
         }
 
@@ -760,12 +783,14 @@ function eggBugHit(eggPlayer, bug){
 
         function raptorBugHit(raptorPlayer, bug){
             if(bug.body.touching.up){
+                squish.play()
                 this.evoBarInterior.displayWidth += 457/10
                 score += 10;
                 scoreText.setText(`${score}`)
                 bug.disableBody(true, true)
                 makeTokens()
              } else if  (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
+                 levelDown.play()
                 raptorPlayer.setTint(0xff0000)  
                 setTimeout(() => {
                     raptorPlayer.clearTint()
@@ -782,12 +807,13 @@ function eggBugHit(eggPlayer, bug){
 
             
             if (this.evoBarInterior.displayWidth >= 457){
-                this.evoBarInterior.displayWidth = 0
+                this.evoBarInterior.displayWidth = 30
     
                 activeAvatar.raptor = false
                 activeAvatar.king = true
                 
-                becomeKing(raptorPlayer)    
+                becomeKing(raptorPlayer)  
+                levelUp.play()  
         
                 }
             
@@ -817,12 +843,14 @@ function eggBugHit(eggPlayer, bug){
 
         function kingBugHit(kingPlayer, bug){
             if (bug.body.touching.up){
+                squish.play()
                 this.evoBarInterior.displayWidth += 30
                 score += 10;
             scoreText.setText(`${score}`);
             bug.disableBody(true, true)
             makeTokens()}
             else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
+                levelDown.play()
                 kingPlayer.setTint(0xff0000)  
         setTimeout(() => {
             kingPlayer.clearTint()
@@ -857,29 +885,14 @@ if (this.evoBarInterior.displayWidth <= 0){
         this.physics.add.overlap(chickenPlayer, binaryTokens, collectBinary, null, this);
         this.physics.add.overlap(raptorPlayer, binaryTokens, collectBinary, null, this);
         this.physics.add.overlap(kingPlayer, binaryTokens, collectBinary, null, this);
-        this.physics.add.overlap(eggPlayer, binaryTokens10, collectBinary10, null, this);
-        this.physics.add.overlap(chickenPlayer, binaryTokens10, collectBinary10, null, this);
-        this.physics.add.overlap(raptorPlayer, binaryTokens10, collectBinary10, null, this);
-        this.physics.add.overlap(kingPlayer, binaryTokens10, collectBinary10, null, this);
-        
+    
+
         function collectBinary(player, binaryTokens) {
             binaryTokens.disableBody(true, true)
-            score += 10;
+            score += 100;
             scoreText.setText(`${score}`);
-            this.evoBarInterior.displayWidth += 15
-
           } 
 
-          function collectBinary10(player, binaryTokens10) {
-            if (this.evoBarInterior.displayWidth >= 443){
-                this.evoBarInterior.displayWidth = 443
-                console.log(player.texture.key)
-            }
-            binaryTokens10.disableBody(true, true)
-            score += 10;
-            scoreText.setText(`${score}`);
-            this.evoBarInterior.displayWidth += 15
-
-          } 
+        
 
     }
