@@ -35,6 +35,7 @@ var levelDown;
 var levelUp; 
 var scream; 
 var squish; 
+var devolve;
 
 
 function preload ()
@@ -45,15 +46,14 @@ function preload ()
      this.load.image('inner_bar', 'assets/inner_bar.jpg');
  
 //background and status screens
-
 this.load.image('background', 'assets/background.png');
-// this.load.image('introscreen', 'assets/intro_screen.png')
-// this.load.image('loginscreen', 'assets/login_screen.png')
-// this.load.image('eggscreen', 'assets/egg_screen.png')
-// this.load.image('chickenscreen', 'assets/chicken_screen.png')
-// this.load.image('raptorscreen', 'assets/raptor_screen.png')
+this.load.image('introscreen', 'assets/intro_screen.png')
+this.load.image('loginscreen', 'assets/login_screen.png')
+this.load.image('eggscreen', 'assets/egg_screen.png')
+this.load.image('chickenscreen', 'assets/chicken_screen.png')
+this.load.image('raptorscreen', 'assets/raptor_screen.png')
 this.load.image('kingscreen', 'assets/king_screen.png')
-// this.load.image('restartscreen', 'assets/restart_screen.png')
+this.load.image('restartscreen', 'assets/restart_screen.png')
 
 
 //boundaries and platforms
@@ -80,6 +80,7 @@ this.load.audio('level_down', 'assets/sounds/level_down.mp3')
 this.load.audio('level_up', 'assets/sounds/level_up.mp3')
 this.load.audio('scream', 'assets/sounds/scream.mp3')
 this.load.audio('squish', 'assets/sounds/squish.mp3')
+this.load.audio('devolve', 'assets/sounds/devolve.mp3')
 }
 
 
@@ -87,9 +88,10 @@ function create ()
 {
     
     //in-game screens
+   
     // this.intro = this.add.image(1300, 360, 'introscreen')
     // this.login = this.add.image(1305, 300, 'loginscreen')
-    // this.eggScreen = this.add.image(1305, 555, 'eggscreen')
+    // eggScreen = this.add.image(1305, 555, 'eggscreen')
     // this.chickenScreen = this.add.image(1305, 510, 'chickenscreen')
     // this.raptorScreen = this.add.image(1302, 544, 'raptorscreen')
     this.kingScreen = this.add.image(1302, 580, 'kingscreen')
@@ -109,6 +111,7 @@ function create ()
     levelUp = this.sound.add('level_up')
     scream = this.sound.add('scream')
     squish = this.sound.add('squish')
+    devolve = this.sound.add('devolve')
 
 
     //  background
@@ -375,8 +378,14 @@ function createBug(){
     });
 
     this.anims.create({
-        key: 'raptorturn',
+        key: 'raptorStaticRight',
         frames: [ { key: 'raptor', frame: 5 } ],
+        frameRate: 10,
+        repeat: -1
+    });
+    this.anims.create({
+        key: 'raptorStaticLeft',
+        frames: [ { key: 'raptor', frame: 2 } ],
         frameRate: 10,
         repeat: -1
     });
@@ -506,7 +515,7 @@ if (activeAvatar.egg) {
      if (cursors.up.isDown && eggPlayer.body.touching.down )
      {
         eggSound.play()
-         eggPlayer.setVelocityY(-400);
+         eggPlayer.setVelocityY(-375);
      }
 }
     //bugs
@@ -538,7 +547,7 @@ if (activeAvatar.egg) {
          lastCursor = "right"
      }
      else if (cursors.space.isDown){
-         gobble.play()
+         
          if (lastCursor === "right"){
         chickenPlayer.setVelocityX(520)
      chickenPlayer.anims.play('chickright', true)
@@ -583,7 +592,7 @@ if (activeAvatar.egg) {
         lastCursor = "right"
     }
     else if (cursors.space.isDown){
-        setTimeout(()=>{if (lastCursor === "left"){
+        if (lastCursor === "left"){
             
             kingPlayer.setVelocityX(0);
             var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, 'cake')
@@ -609,7 +618,7 @@ if (activeAvatar.egg) {
             cakeAmmo.setVelocityX(200)
             setTimeout(() =>{
                 cakeAmmo.destroy();},1000)
-        }},4000)
+        }
         
     }
     else if (lastCursor === "left")
@@ -655,6 +664,7 @@ if (activeAvatar.raptor){
 
     else if(cursors.space.isDown){
         scream.play()
+        scream.setLoop(false)
         if (lastCursor === "left"){
             
             raptorPlayer.setVelocityX(0);
@@ -676,13 +686,13 @@ if (activeAvatar.raptor){
     {
         raptorPlayer.setVelocityX(0);
 
-        raptorPlayer.anims.play('raptorleft', true);
+        raptorPlayer.anims.play('raptorStaticLeft', true);
     }
     else if (lastCursor === "right")
     {
         raptorPlayer.setVelocityX(0);
 
-        raptorPlayer.anims.play('raptorright', true);
+        raptorPlayer.anims.play('raptorStaticRight', true);
     }
 
     if (cursors.up.isDown && raptorPlayer.body.touching.down)
@@ -777,6 +787,7 @@ function eggBugHit(eggPlayer, bug){
 
     function chickenBugHit(chickenPlayer, bug) {
         if(bug.body.touching.up || cursors.space.isDown){
+            gobble.play()
             squish.play()
             this.evoBarInterior.displayWidth += 457/7
             score += 20;
@@ -795,6 +806,7 @@ function eggBugHit(eggPlayer, bug){
                 scoreText.setText(`${score}`);
                 if (this.evoBarInterior.displayWidth <= 0){
                         becomeEgg(chickenPlayer)
+                        devolve.play()
                        
                      }
             } 
@@ -837,7 +849,8 @@ function eggBugHit(eggPlayer, bug){
                     scoreText.setText(`${score}`);
                 }
                     if (this.evoBarInterior.displayWidth <= 0){
-                        // becomeEgg(raptorPlayer)
+                        becomeEgg(raptorPlayer)
+                        devolve.play()
                     
                 }
             
@@ -898,7 +911,8 @@ if (this.evoBarInterior.displayWidth >= 443){
     this.evoBarInterior.displayWidth = 443
 }                
 if (this.evoBarInterior.displayWidth <= 0){
-                    // becomeEgg(kingPlayer)
+                    becomeEgg(kingPlayer)
+                    devolve.play()
 
                 }
 
@@ -928,8 +942,13 @@ if (this.evoBarInterior.displayWidth <= 0){
         scene.physics.add.collider(cakes, gameBoundaries, cakeWallHit, null, scene)
 
         function cakeBugHit(cakeAmmo, bug){
+            cake.play()
+            score += 20
+            scoreText.setText(`${score}`);
             cakeAmmo.destroy()
             bug.destroy()
+            makeTokens()
+
         }
 
         function cakeWallHit(cakeAmmo, wall){
@@ -938,6 +957,7 @@ if (this.evoBarInterior.displayWidth <= 0){
        
         
         function collectBinary(player, binaryTokens) {
+            coins.play()
             binaryTokens.destroy()
             score += 100;
             scoreText.setText(`${score}`);

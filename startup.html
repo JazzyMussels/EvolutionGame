@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Evolution</title>
+    <style>
+        body {
+            background-image: url('assets/startup.png');
+            background-size: cover;
+        }
+        #start_button {
+            /* background-color: green; */
+            position: absolute;
+            left: 64vw;
+            top: 54vh;
+            bottom: 80vh;
+            width: 436px;
+            height: 285px;
+        }
+        #username_box {
+            /* background-color: green; */
+            position: absolute;
+            left: 50.5vw;
+            top: 74vh;
+            bottom: 30vh;
+            width: 178px;
+            height: 27px;
+        }
+        #submit_box {
+            background-color: green;
+            position: absolute;
+            left: 50.6vw;
+            top: 82.3vh;
+            bottom: 30vh;
+            width: 178px;
+            height: 50.5px;
+        }
+    </style>
+</head>
+<body>
+    <div id='start_button'></div>
+    <div id='username_box'></div>
+    <a id='submit_box' href='index.html'></a>
+    <script>
+        let startupScreen = true
+        let loginPage = false
+        document.addEventListener('click', () => {
+            if (event.target.id === 'start_button' && startupScreen) {
+                startupScreen = false
+                loginPage = true
+                document.body.style.backgroundImage = 'url(assets/login_page.png)'
+                console.log('clicked')
+            }
+            if (event.target.id === 'submit_box' && loginPage) {
+                console.log('woof')
+            }
+        })
+        </script>
+    
+</body>
+</html>
