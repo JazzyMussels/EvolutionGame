@@ -376,39 +376,41 @@ function createBug(){
 
      raptorPlayer.disableBody(true,true)
 
-    // // cake ammo
-    // cakeAmmo = this.physics.add.sprite(100, 650, 'cake')
-    //  cakeAmmo.setScale(0.18)
-    //  cakeAmmo.setBounce(0);
-    //  cakeAmmo.score = 0
-    //  cakeAmmo.setCollideWorldBounds(true)
+    //  cake ammo
+    cakes = this.physics.add.group({
+        key: 'cake',
+        setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
+    })
+    cakes.children.iterate(function(cakeAmmo){
+        cakeAmmo.setScale(0.18)
+        cakeAmmo.setBounce(0);
+        cakeAmmo.setCollideWorldBounds(true)
+         cakeAmmo.disableBody(true,true)
+        
+    })
+    
+    this.physics.add.collider(cakes, cloudPlatforms)
+    this.physics.add.collider(cakes, gameBoundaries)
 
-    //  this.physics.add.collider(cakeAmmo, cloudPlatforms)
-    //  this.physics.add.collider(cakeAmmo, gameBoundaries)
+     
  
    
-    //  this.anims.create({
-    //     key: 'left',
-    //     frames: [ { key: 'cake', frame: 0 } ],
-    //     frameRate: 10,
-    //     repeat: -1
-    // });
+     this.anims.create({
+        key: 'cakeleft',
+        frames: [ { key: 'cake', frame: 0 } ],
+        frameRate: 10,
+        repeat: -1
+    });
 
-    // this.anims.create({
-    //     key: 'turn',
-    //     frames: [ { key: 'cake', frame: 0} ],
-    //     frameRate: 10,
-    //     repeat: -1
-    // });
 
-    // this.anims.create({
-    //     key: 'right',
-    //     frames: [ { key: 'cake', frame: 1 } ],
-    //     frameRate: 10,
-    //     repeat: -1
+    this.anims.create({
+        key: 'cakeright',
+        frames: [ { key: 'cake', frame: 1 } ],
+        frameRate: 10,
+        repeat: -1
 
        
-    // });
+    });
 
     // binary
     binaryTokens = this.physics.add.group({
@@ -558,6 +560,36 @@ if (activeAvatar.egg) {
         kingPlayer.anims.play('kingright', true);
         lastCursor = "right"
     }
+    else if (cursors.space.isDown){
+        setTimeout(()=>{if (lastCursor === "left"){
+            
+            kingPlayer.setVelocityX(0);
+            var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, 'cake')
+             cakeAmmo.anims.play('cakeleft', true);
+             cakeAmmo.setScale(0.18)
+             cakeAmmo.setBounce(0);
+             
+             cakeAmmo.setCollideWorldBounds(true)
+            cakeAmmo.setVelocityX(-200)
+            setTimeout(() =>{
+                cakeAmmo.destroy();},1000)
+        
+        }
+        if (lastCursor === "right"){
+            console.log("cakeright")
+            kingPlayer.setVelocityX(0);
+            var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, 'cake')
+             cakeAmmo.anims.play('cakeright', true);
+             cakeAmmo.setScale(0.18)
+        cakeAmmo.setBounce(0);
+
+        cakeAmmo.setCollideWorldBounds(true)
+            cakeAmmo.setVelocityX(200)
+            setTimeout(() =>{
+                cakeAmmo.destroy();},1000)
+        }},4000)
+        
+    }
     else if (lastCursor === "left")
     {
         kingPlayer.setVelocityX(0);
@@ -571,6 +603,11 @@ if (activeAvatar.egg) {
 
         kingPlayer.anims.play('kingright', true);
     }
+
+    
+
+       
+         
 
     if (cursors.up.isDown && kingPlayer.body.touching.down)
     {
@@ -637,6 +674,25 @@ if (activeAvatar.raptor){
             var x2 = Phaser.Math.Between(0, 800);
             var tokens = binaryTokens.create(x, 16, 'binary');
             var tokens10 = binaryTokens10.create(x2, 16,'binary10');
+            tokens.setScale(0.3);
+        tokens10.setScale(0.3);
+        tokens10.setBounce(1,0);
+        tokens.setBounce(1,0);
+        tokens10.setCollideWorldBounds(true);
+        tokens.setCollideWorldBounds(true);
+        this.physics.add.collider(tokens, cloudPlatforms);
+        this.physics.add.collider(tokens, gameBoundaries);
+         this.physics.add.collider(tokens10, cloudPlatforms);
+         this.physics.add.collider(tokens10, gameBoundaries);
+            
+                setTimeout(() => {
+                    tokens.destroy();
+                  }, 1000)
+                  setTimeout(() => {
+                    tokens.destroy();
+                  }, 1000)
+                
+            
 
     //     var tokens = scene.physics.add.group({
     //     key: 'binary',
@@ -649,23 +705,8 @@ if (activeAvatar.raptor){
     //     setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
     // }); 
         
-        tokens.setScale(0.3);
-        tokens10.setScale(0.3);
-        tokens10.setBounce(1,0);
-        tokens.setBounce(1,0);
-        tokens10.setCollideWorldBounds(true);
-        tokens.setCollideWorldBounds(true);
-        this.physics.add.collider(tokens, cloudPlatforms);
-        this.physics.add.collider(tokens, gameBoundaries);
-         this.physics.add.collider(tokens10, cloudPlatforms);
-         this.physics.add.collider(tokens10, gameBoundaries);
+        
          
-         setTimeout(() => {
-            tokens.disableBody(true, true);
-          }, 1000)
-          setTimeout(() => {
-            tokens10.disableBody(true, true);
-          }, 1000)
         
     // this.physics.add.collider(tokens, cloudPlatforms)
     // this.physics.add.collider(tokens, gameBoundaries)
@@ -680,10 +721,10 @@ this.physics.add.collider(eggPlayer, bugs, eggBugHit, null, this);
 function eggBugHit(eggPlayer, bug){
     if (bug.body.touching.up){
         this.evoBarInterior.displayWidth += 457/5
-        score += 10;
+        score += 20;
     scoreText.setText(`${score}`);
     makeTokens()
-    bug.disableBody(true, true)}
+    bug.destroy()}
     else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
             if ( this.evoBarInterior.displayWidth >= 15) {
                 this.evoBarInterior.displayWidth -= 15
@@ -721,7 +762,7 @@ function eggBugHit(eggPlayer, bug){
     function chickenBugHit(chickenPlayer, bug) {
         if(bug.body.touching.up || cursors.space.isDown){
             this.evoBarInterior.displayWidth += 457/7
-            score += 10;
+            score += 20;
             scoreText.setText(`${score}`);
             makeTokens()
             bug.disableBody(true,true)
@@ -735,7 +776,7 @@ function eggBugHit(eggPlayer, bug){
                 score -= 10;
                 scoreText.setText(`${score}`);
                 if (this.evoBarInterior.displayWidth <= 0){
-                        becomeEgg(chickenPlayer)
+                        // becomeEgg(chickenPlayer)
                      }
             } 
         
@@ -761,9 +802,9 @@ function eggBugHit(eggPlayer, bug){
         function raptorBugHit(raptorPlayer, bug){
             if(bug.body.touching.up){
                 this.evoBarInterior.displayWidth += 457/10
-                score += 10;
+                score += 20;
                 scoreText.setText(`${score}`)
-                bug.disableBody(true, true)
+                bug.destroy()
                 makeTokens()
              } else if  (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
                 raptorPlayer.setTint(0xff0000)  
@@ -775,7 +816,7 @@ function eggBugHit(eggPlayer, bug){
                     scoreText.setText(`${score}`);
                 }
                     if (this.evoBarInterior.displayWidth <= 0){
-                        becomeEgg(raptorPlayer)
+                        // becomeEgg(raptorPlayer)
                     
                 }
             
@@ -804,8 +845,6 @@ function eggBugHit(eggPlayer, bug){
         }
 
         function becomeKing(raptorPlayer){
-            ;
-            console.log(raptorPlayer.y)
             //corrected the king falling through the floor when changing from raptor
             let y = (raptorPlayer.y >= 669) ? 661.4 : raptorPlayer.y
             kingPlayer.enableBody(true, raptorPlayer.x, y, true, true);
@@ -818,9 +857,9 @@ function eggBugHit(eggPlayer, bug){
         function kingBugHit(kingPlayer, bug){
             if (bug.body.touching.up){
                 this.evoBarInterior.displayWidth += 30
-                score += 10;
+                score += 20;
             scoreText.setText(`${score}`);
-            bug.disableBody(true, true)
+            bug.destroy()
             makeTokens()}
             else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
                 kingPlayer.setTint(0xff0000)  
@@ -835,7 +874,7 @@ if (this.evoBarInterior.displayWidth >= 443){
     this.evoBarInterior.displayWidth = 443
 }                
 if (this.evoBarInterior.displayWidth <= 0){
-                    becomeEgg(kingPlayer)
+                    // becomeEgg(kingPlayer)
 
                 }
 
@@ -847,7 +886,9 @@ if (this.evoBarInterior.displayWidth <= 0){
             eggPlayer.enableBody(true, player.x, player.y,true, true)
             player.disableBody(true,true)
             activeAvatar.egg = true;
-            // activeAvatar.king = false
+             activeAvatar.king = false
+             activeAvatar.chicken = false
+             activeAvatar.raptor = false
             scene.physics.add.collider(eggPlayer, bugs, eggBugHit, null, scene)
            
   
@@ -861,10 +902,24 @@ if (this.evoBarInterior.displayWidth <= 0){
         this.physics.add.overlap(chickenPlayer, binaryTokens10, collectBinary10, null, this);
         this.physics.add.overlap(raptorPlayer, binaryTokens10, collectBinary10, null, this);
         this.physics.add.overlap(kingPlayer, binaryTokens10, collectBinary10, null, this);
+
+        scene.physics.add.collider(cakes, bugs, cakeBugHit, null, scene)
+        scene.physics.add.collider(cakes, cloudPlatforms, cakeWallHit, null, scene)
+        scene.physics.add.collider(cakes, gameBoundaries, cakeWallHit, null, scene)
+
+        function cakeBugHit(cakeAmmo, bug){
+            cakeAmmo.destroy()
+            bug.destroy()
+        }
+
+        function cakeWallHit(cakeAmmo, wall){
+            cakeAmmo.destroy()
+        }
+       
         
         function collectBinary(player, binaryTokens) {
-            binaryTokens.disableBody(true, true)
-            score += 10;
+            binaryTokens.destroy()
+            score += 20;
             scoreText.setText(`${score}`);
             this.evoBarInterior.displayWidth += 15
 
@@ -876,7 +931,7 @@ if (this.evoBarInterior.displayWidth <= 0){
                 console.log(player.texture.key)
             }
             binaryTokens10.disableBody(true, true)
-            score += 10;
+            score += 20;
             scoreText.setText(`${score}`);
             this.evoBarInterior.displayWidth += 15
 
