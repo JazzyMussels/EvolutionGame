@@ -37,6 +37,7 @@ var scream;
 var squish; 
 var touchingObj;
 var scoreText;
+var cakeFire;
 
 function preload ()
 {
@@ -117,10 +118,8 @@ function create ()
     this.scoreCard = this.add.image(1020, 40, 'scorecard')
     this.scoreCard.setScale(0.6)
      //score
-     scoreText = this.add.text(1283, 20, '0', { fontSize: '41px', fill: '#1df4ff' });
-     
-    console.log(scoreText)
-    divLine = this.add.text(1200, 40, '--------', { fontSize: '41px', fill: '#1df4ff' });
+    //  scoreText = this.add.text(1283, 20, '0', { fontSize: '41px', fill: '#1df4ff' });
+    // divLine = this.add.text(1200, 40, '--------', { fontSize: '41px', fill: '#1df4ff' });
     
     // evolve-bar
     this.evoBarShell = this.add.image(295, 40, 'outer_shell')
@@ -235,9 +234,9 @@ bugs.children.iterate(function(bug){
     bug.setVelocityX(-160)
 })
 
-console.log(this)
+
 // if((bugs.countActive(true) < 10)){
-    console.log(bugs.countActive(true))
+    
 if (activeAvatar.egg){
     this.time.addEvent({
         delay: 4000,
@@ -281,7 +280,7 @@ function createBug(){
 
     //chicken
       chickenPlayer = this.physics.add.sprite(100, 650, 'chicken')
-      console.log(chickenPlayer)
+      
       chickenPlayer.setScale(1.2)
       chickenPlayer.setBounce(0);
       chickenPlayer.score = 0
@@ -473,6 +472,7 @@ function update(){
 
     if(activeAvatar.restart && activeAvatar.egg){
         this.restartScreen = this.add.image(1302, 480, 'restartscreen')
+        
     }   else if (activeAvatar.egg){
         this.eggScreen = this.add.image(1305, 555, 'eggscreen')
         }
@@ -487,7 +487,8 @@ function update(){
         else if (activeAvatar.king){
        this.kingScreen = this.add.image(1302, 580, 'kingscreen')
         }
-       
+        scoreText = this.add.text(1283, 20, `${score}`, { fontSize: '41px', fill: '#1df4ff' });
+    divLine = this.add.text(1200, 40, '--------', { fontSize: '41px', fill: '#1df4ff' });
         
     //egg
 if (activeAvatar.egg) {
@@ -614,7 +615,7 @@ if (activeAvatar.egg) {
         
         }
         if (lastCursor === "right"){
-            console.log("cakeright")
+        
             kingPlayer.setVelocityX(0);
             var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, 'cake')
              cakeAmmo.anims.play('cakeright', true);
@@ -903,7 +904,7 @@ function eggBugHit(eggPlayer, bug){
             let y = (raptorPlayer.y >= 669) ? 661.4 : raptorPlayer.y
             kingPlayer.enableBody(true, raptorPlayer.x, y, true, true);
             raptorPlayer.setTexture("king");
-            console.log(kingPlayer);
+            ;
             raptorPlayer.disableBody(true, true);
             scene.physics.add.collider(kingPlayer, bugs, kingBugHit, null, scene);
         }
@@ -933,6 +934,7 @@ function eggBugHit(eggPlayer, bug){
 
         }
 
+        // game.world.bringToTop(scoreText)
         function becomeEgg(player){
 
             player.setTexture( 'egg')
@@ -979,7 +981,10 @@ function eggBugHit(eggPlayer, bug){
             score += 100;
             scoreText.setText(`${score}`);
           } 
-
+          
+          
+          
+        // game.canvas.bringToTop(scoreText)
         
 
     }
