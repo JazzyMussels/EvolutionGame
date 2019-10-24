@@ -38,6 +38,7 @@ var squish;
 var touchingObj;
 var scoreText;
 var cakeFire;
+var devolve;
 
 function preload ()
 {
@@ -47,7 +48,6 @@ function preload ()
      this.load.image('inner_bar', 'assets/inner_bar.jpg');
  
 //background and status screens
-
 this.load.image('background', 'assets/background.png');
 this.load.image('introscreen', 'assets/intro_screen.png')
 this.load.image('loginscreen', 'assets/login_screen.png')
@@ -82,6 +82,7 @@ this.load.audio('level_down', 'assets/sounds/level_down.mp3')
 this.load.audio('level_up', 'assets/sounds/level_up.mp3')
 this.load.audio('scream', 'assets/sounds/scream.mp3')
 this.load.audio('squish', 'assets/sounds/squish.mp3')
+this.load.audio('devolve', 'assets/sounds/devolve.mp3')
 }
 
 
@@ -89,6 +90,7 @@ function create ()
 {
     
     //in-game screens
+   
     // this.intro = this.add.image(1300, 360, 'introscreen')
     // this.login = this.add.image(1305, 300, 'loginscreen')
     
@@ -108,6 +110,7 @@ function create ()
     levelUp = this.sound.add('level_up')
     scream = this.sound.add('scream')
     squish = this.sound.add('squish')
+    devolve = this.sound.add('devolve')
 
 
     //  background
@@ -374,8 +377,14 @@ function createBug(){
     });
 
     this.anims.create({
-        key: 'raptorturn',
+        key: 'raptorStaticRight',
         frames: [ { key: 'raptor', frame: 5 } ],
+        frameRate: 10,
+        repeat: -1
+    });
+    this.anims.create({
+        key: 'raptorStaticLeft',
+        frames: [ { key: 'raptor', frame: 2 } ],
         frameRate: 10,
         repeat: -1
     });
@@ -523,7 +532,7 @@ if (activeAvatar.egg) {
      if (cursors.up.isDown && eggPlayer.body.touching.down )
      {
         eggSound.play()
-         eggPlayer.setVelocityY(-400);
+         eggPlayer.setVelocityY(-375);
      }
 }
     //bugs
@@ -555,7 +564,7 @@ if (activeAvatar.egg) {
          lastCursor = "right"
      }
      else if (cursors.space.isDown){
-         gobble.play()
+         
          if (lastCursor === "right"){
         chickenPlayer.setVelocityX(520)
      chickenPlayer.anims.play('chickright', true)
@@ -672,6 +681,7 @@ if (activeAvatar.raptor){
 
     else if(cursors.space.isDown){
         scream.play()
+        scream.setLoop(false)
         if (lastCursor === "left"){
             
             raptorPlayer.setVelocityX(0);
@@ -693,13 +703,13 @@ if (activeAvatar.raptor){
     {
         raptorPlayer.setVelocityX(0);
 
-        raptorPlayer.anims.play('raptorleft', true);
+        raptorPlayer.anims.play('raptorStaticLeft', true);
     }
     else if (lastCursor === "right")
     {
         raptorPlayer.setVelocityX(0);
 
-        raptorPlayer.anims.play('raptorright', true);
+        raptorPlayer.anims.play('raptorStaticRight', true);
     }
 
     if (cursors.up.isDown && raptorPlayer.body.touching.down)
@@ -816,6 +826,7 @@ function eggBugHit(eggPlayer, bug){
 
     function chickenBugHit(chickenPlayer, bug) {
         if(bug.body.touching.up || cursors.space.isDown){
+            gobble.play()
             squish.play()
             this.evoBarInterior.displayWidth += 457/7
             score += 50;
@@ -831,6 +842,7 @@ function eggBugHit(eggPlayer, bug){
       bugHurt(bug, chickenPlayer, touchingObj)
                 if (this.evoBarInterior.displayWidth <= 0){
                         becomeEgg(chickenPlayer)
+                        devolve.play()
                        
                      }
             } 
@@ -871,6 +883,7 @@ function eggBugHit(eggPlayer, bug){
              }
                     if (this.evoBarInterior.displayWidth <= 0){
                         becomeEgg(raptorPlayer)
+                        devolve.play()
                     
                 }
             
@@ -923,12 +936,13 @@ function eggBugHit(eggPlayer, bug){
                 bugHurt(bug, kingPlayer, touchingObj)
                 score -= 10;
                 scoreText.setText(`${score}`);
-            }
-                if (this.evoBarInterior.displayWidth >= 443){
-                this.evoBarInterior.displayWidth = 443
-                 }                
-                if (this.evoBarInterior.displayWidth <= 0){
+                }
+if (this.evoBarInterior.displayWidth >= 443){
+    this.evoBarInterior.displayWidth = 443
+}                
+if (this.evoBarInterior.displayWidth <= 0){
                     becomeEgg(kingPlayer)
+                    devolve.play()
 
                 }
 
@@ -965,10 +979,13 @@ function eggBugHit(eggPlayer, bug){
 
         function cakeBugHit(cakeAmmo, bug){
             this.evoBarInterior.displayWidth += 30
+            cake.play()
             score += 50;
             scoreText.setText(`${score}`);
             cakeAmmo.destroy()
             bug.destroy()
+            makeTokens()
+
         }
 
         function cakeWallHit(cakeAmmo, wall){
@@ -977,6 +994,7 @@ function eggBugHit(eggPlayer, bug){
        
         
         function collectBinary(player, binaryTokens) {
+            coins.play()
             binaryTokens.destroy()
             score += 100;
             scoreText.setText(`${score}`);
