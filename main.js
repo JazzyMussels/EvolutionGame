@@ -67,6 +67,7 @@ this.load.spritesheet('bug', 'assets/bugsprite.png', { frameWidth: 80, frameHeig
 
 function create ()
 {
+    
     //in-game screens
     // this.intro = this.add.image(1300, 360, 'introscreen')
     // this.login = this.add.image(1305, 300, 'loginscreen')
@@ -81,7 +82,6 @@ function create ()
     //  background
     this.background = this.add.image(0, 0, 'background');
     this.background.setOrigin(0,0)
-
 
     // scorecard
     this.scoreCard = this.add.image(1020, 40, 'scorecard')
@@ -449,6 +449,8 @@ function createBug(){
 
 function update(){
 
+    
+
     //egg
 if (activeAvatar.egg) {
      if (cursors.left.isDown )
@@ -686,6 +688,10 @@ function eggBugHit(eggPlayer, bug){
             if ( this.evoBarInterior.displayWidth >= 15) {
                 this.evoBarInterior.displayWidth -= 15
             }
+        eggPlayer.setTint(0xff0000)  
+        setTimeout(() => {
+            eggPlayer.clearTint()
+        }, 1000)  
         score -= 10;
         scoreText.setText(`${score}`);
         }
@@ -720,13 +726,18 @@ function eggBugHit(eggPlayer, bug){
             makeTokens()
             bug.disableBody(true,true)
         }
-            else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
-                if ( this.evoBarInterior.displayWidth >= 15) {
-                    this.evoBarInterior.displayWidth -= 15
-                }
-            score -= 10;
-            scoreText.setText(`${score}`);
-            }
+        else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
+            chickenPlayer.setTint(0xff0000)  
+                    setTimeout(() => {
+                        chickenPlayer.clearTint()
+                    }, 1000) ;
+                this.evoBarInterior.displayWidth -= 15
+                score -= 10;
+                scoreText.setText(`${score}`);
+                if (this.evoBarInterior.displayWidth <= 0){
+                        becomeEgg(chickenPlayer)
+                     }
+            } 
         
         if (this.evoBarInterior.displayWidth >= 457){
             this.evoBarInterior.displayWidth = 0
@@ -755,11 +766,17 @@ function eggBugHit(eggPlayer, bug){
                 bug.disableBody(true, true)
                 makeTokens()
              } else if  (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
-                if ( this.evoBarInterior.displayWidth >= 15) {
+                raptorPlayer.setTint(0xff0000)  
+                setTimeout(() => {
+                    raptorPlayer.clearTint()
+                }, 1000)  
                     this.evoBarInterior.displayWidth -= 15
-                }
                     score -= 10;
                     scoreText.setText(`${score}`);
+                }
+                    if (this.evoBarInterior.displayWidth <= 0){
+                        becomeEgg(raptorPlayer)
+                    
                 }
             
 
@@ -806,15 +823,34 @@ function eggBugHit(eggPlayer, bug){
             bug.disableBody(true, true)
             makeTokens()}
             else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
-                if ( this.evoBarInterior.displayWidth >= 15) {
-                    this.evoBarInterior.displayWidth -= 15
-                }
+                kingPlayer.setTint(0xff0000)  
+        setTimeout(() => {
+            kingPlayer.clearTint()
+        }, 1000)  
+        this.evoBarInterior.displayWidth -= 15
                 score -= 10;
                 scoreText.setText(`${score}`);
                 }
-            if (this.evoBarInterior.displayWidth >= 443){
-                this.evoBarInterior.displayWidth = 443
-            }
+if (this.evoBarInterior.displayWidth >= 443){
+    this.evoBarInterior.displayWidth = 443
+}                
+if (this.evoBarInterior.displayWidth <= 0){
+                    becomeEgg(kingPlayer)
+
+                }
+
+        }
+
+        function becomeEgg(player){
+
+            player.setTexture( 'egg')
+            eggPlayer.enableBody(true, player.x, player.y,true, true)
+            player.disableBody(true,true)
+            activeAvatar.egg = true;
+            // activeAvatar.king = false
+            scene.physics.add.collider(eggPlayer, bugs, eggBugHit, null, scene)
+           
+  
         }
 
         this.physics.add.overlap(eggPlayer, binaryTokens, collectBinary, null, this);
