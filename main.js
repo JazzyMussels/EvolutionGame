@@ -24,7 +24,7 @@ var gameBoundaries;
 var cloudPlatforms;
 var chickenPlayer;
 var score = 0;
-var activeAvatar = {egg: false, chicken: false, raptor: false, king: false}
+var activeAvatar = {egg: true, chicken: false, raptor: false, king: false, restart: false}
 var lastCursor;
 var scene;
 var cake;
@@ -35,7 +35,8 @@ var levelDown;
 var levelUp; 
 var scream; 
 var squish; 
-
+var touchingObj;
+var scoreText;
 
 function preload ()
 {
@@ -47,13 +48,13 @@ function preload ()
 //background and status screens
 
 this.load.image('background', 'assets/background.png');
-// this.load.image('introscreen', 'assets/intro_screen.png')
-// this.load.image('loginscreen', 'assets/login_screen.png')
-// this.load.image('eggscreen', 'assets/egg_screen.png')
-// this.load.image('chickenscreen', 'assets/chicken_screen.png')
-// this.load.image('raptorscreen', 'assets/raptor_screen.png')
+this.load.image('introscreen', 'assets/intro_screen.png')
+this.load.image('loginscreen', 'assets/login_screen.png')
+this.load.image('eggscreen', 'assets/egg_screen.png')
+this.load.image('chickenscreen', 'assets/chicken_screen.png')
+this.load.image('raptorscreen', 'assets/raptor_screen.png')
 this.load.image('kingscreen', 'assets/king_screen.png')
-// this.load.image('restartscreen', 'assets/restart_screen.png')
+this.load.image('restartscreen', 'assets/restart_screen.png')
 
 
 //boundaries and platforms
@@ -89,11 +90,8 @@ function create ()
     //in-game screens
     // this.intro = this.add.image(1300, 360, 'introscreen')
     // this.login = this.add.image(1305, 300, 'loginscreen')
-    // this.eggScreen = this.add.image(1305, 555, 'eggscreen')
-    // this.chickenScreen = this.add.image(1305, 510, 'chickenscreen')
-    // this.raptorScreen = this.add.image(1302, 544, 'raptorscreen')
-    this.kingScreen = this.add.image(1302, 580, 'kingscreen')
-    // this.restartScreen = this.add.image(1302, 480, 'restartscreen')
+    
+    //  this.restartScreen = this.add.image(1302, 480, 'restartscreen')
     
     //soundtrack
     let music = this.sound.add('soundtrack')
@@ -119,7 +117,9 @@ function create ()
     this.scoreCard = this.add.image(1020, 40, 'scorecard')
     this.scoreCard.setScale(0.6)
      //score
-    scoreText = this.add.text(1283, 20, '0', { fontSize: '41px', fill: '#1df4ff' });
+     scoreText = this.add.text(1283, 20, '0', { fontSize: '41px', fill: '#1df4ff' });
+     
+    console.log(scoreText)
     divLine = this.add.text(1200, 40, '--------', { fontSize: '41px', fill: '#1df4ff' });
     
     // evolve-bar
@@ -471,8 +471,24 @@ function createBug(){
 
 function update(){
 
-    
-
+    if(activeAvatar.restart && activeAvatar.egg){
+        this.restartScreen = this.add.image(1302, 480, 'restartscreen')
+    }   else if (activeAvatar.egg){
+        this.eggScreen = this.add.image(1305, 555, 'eggscreen')
+        }
+        else if (activeAvatar.chicken){
+        
+        this.chickenScreen = this.add.image(1305, 510, 'chickenscreen')
+        }
+        else if (activeAvatar.raptor){
+        
+        this.raptorScreen = this.add.image(1302, 544, 'raptorscreen')
+        }
+        else if (activeAvatar.king){
+       this.kingScreen = this.add.image(1302, 580, 'kingscreen')
+        }
+       
+        
     //egg
 if (activeAvatar.egg) {
      if (cursors.left.isDown )
@@ -583,7 +599,7 @@ if (activeAvatar.egg) {
         lastCursor = "right"
     }
     else if (cursors.space.isDown){
-        setTimeout(()=>{if (lastCursor === "left"){
+        if (lastCursor === "left"){
             
             kingPlayer.setVelocityX(0);
             var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, 'cake')
@@ -609,7 +625,7 @@ if (activeAvatar.egg) {
             cakeAmmo.setVelocityX(200)
             setTimeout(() =>{
                 cakeAmmo.destroy();},1000)
-        }},4000)
+        }
         
     }
     else if (lastCursor === "left")
@@ -734,23 +750,17 @@ function eggBugHit(eggPlayer, bug){
     if (bug.body.touching.up){
         squish.play()
         this.evoBarInterior.displayWidth += 457/5
-        score += 20;
+        score += 50;
     scoreText.setText(`${score}`);
     makeTokens()
     bug.destroy()}
     else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
         levelDown.play()
-        eggPlayer.setTint(0xff0000)  
-        setTimeout(() => {
-            eggPlayer.clearTint()
-        }, 1000)  
-            if ( this.evoBarInterior.displayWidth >= 15) {
-                this.evoBarInterior.displayWidth -= 15
-            }
-        
         score -= 10;
         scoreText.setText(`${score}`);
-        }
+        touchingObj = bug.body.touching
+      bugHurt(bug, eggPlayer, touchingObj)
+    }
 
     if (this.evoBarInterior.displayWidth >= 457){
         this.evoBarInterior.displayWidth = 0
@@ -764,6 +774,34 @@ function eggBugHit(eggPlayer, bug){
         
      }
     }
+
+    function bugHurt(bug, player, touchingObj){
+        
+         if (touchingObj.left){
+            bug.setVelocityX(160)
+        }
+        else if (touchingObj.right){
+            bug.setVelocityX(-160)
+        }
+        else if (touchingObj.down){
+            bug.setVelocityY(-300)
+            setTimeout(()=>{
+                bug.setVelocityY(0)
+            }, 1000)
+        }
+        levelDown.play()
+        player.setTint(0xff0000)  
+        setTimeout(() => {
+            player.clearTint()
+        }, 1000)  
+            if ( scene.evoBarInterior.displayWidth >= 15) {
+                scene.evoBarInterior.displayWidth -= 15
+            }
+        
+       
+        }
+       
+
     function becomeChicken(player){
        
         player.setTexture( "chicken")
@@ -779,20 +817,17 @@ function eggBugHit(eggPlayer, bug){
         if(bug.body.touching.up || cursors.space.isDown){
             squish.play()
             this.evoBarInterior.displayWidth += 457/7
-            score += 20;
+            score += 50;
             scoreText.setText(`${score}`);
             makeTokens()
             bug.disableBody(true,true)
         }
         else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
             levelDown.play()
-            chickenPlayer.setTint(0xff0000)  
-                    setTimeout(() => {
-                        chickenPlayer.clearTint()
-                    }, 1000) ;
-                this.evoBarInterior.displayWidth -= 15
-                score -= 10;
-                scoreText.setText(`${score}`);
+            touchingObj = bug.body.touching
+            score -= 10;
+            scoreText.setText(`${score}`);
+      bugHurt(bug, chickenPlayer, touchingObj)
                 if (this.evoBarInterior.displayWidth <= 0){
                         becomeEgg(chickenPlayer)
                        
@@ -822,22 +857,19 @@ function eggBugHit(eggPlayer, bug){
             if(bug.body.touching.up){
                 squish.play()
                 this.evoBarInterior.displayWidth += 457/10
-                score += 20;
+                score += 50;
                 scoreText.setText(`${score}`)
                 bug.destroy()
                 makeTokens()
              } else if  (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
                  levelDown.play()
-                raptorPlayer.setTint(0xff0000)  
-                setTimeout(() => {
-                    raptorPlayer.clearTint()
-                }, 1000)  
-                    this.evoBarInterior.displayWidth -= 15
-                    score -= 10;
-                    scoreText.setText(`${score}`);
-                }
+                 touchingObj = bug.body.touching
+                 bugHurt(bug, raptorPlayer, touchingObj)
+                 score -= 10;
+                 scoreText.setText(`${score}`);
+             }
                     if (this.evoBarInterior.displayWidth <= 0){
-                        // becomeEgg(raptorPlayer)
+                        becomeEgg(raptorPlayer)
                     
                 }
             
@@ -880,25 +912,22 @@ function eggBugHit(eggPlayer, bug){
             if (bug.body.touching.up){
                 squish.play()
                 this.evoBarInterior.displayWidth += 30
-                score += 20;
+                score += 50;
             scoreText.setText(`${score}`);
             bug.destroy()
             makeTokens()}
             else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
                 levelDown.play()
-                kingPlayer.setTint(0xff0000)  
-        setTimeout(() => {
-            kingPlayer.clearTint()
-        }, 1000)  
-        this.evoBarInterior.displayWidth -= 15
+                touchingObj = bug.body.touching
+                bugHurt(bug, kingPlayer, touchingObj)
                 score -= 10;
                 scoreText.setText(`${score}`);
-                }
-if (this.evoBarInterior.displayWidth >= 443){
-    this.evoBarInterior.displayWidth = 443
-}                
-if (this.evoBarInterior.displayWidth <= 0){
-                    // becomeEgg(kingPlayer)
+            }
+                if (this.evoBarInterior.displayWidth >= 443){
+                this.evoBarInterior.displayWidth = 443
+                 }                
+                if (this.evoBarInterior.displayWidth <= 0){
+                    becomeEgg(kingPlayer)
 
                 }
 
@@ -909,13 +938,18 @@ if (this.evoBarInterior.displayWidth <= 0){
             player.setTexture( 'egg')
             eggPlayer.enableBody(true, player.x, player.y,true, true)
             player.disableBody(true,true)
-            activeAvatar.egg = true;
+            activeAvatar.restart = true
+            activeAvatar.egg = true
              activeAvatar.king = false
              activeAvatar.chicken = false
              activeAvatar.raptor = false
             scene.physics.add.collider(eggPlayer, bugs, eggBugHit, null, scene)
+            setTimeout(()=>{
+                activeAvatar.restart = false;
+            }, 10000)
+            
+            
            
-  
         }
 
         this.physics.add.overlap(eggPlayer, binaryTokens, collectBinary, null, this);
@@ -928,6 +962,9 @@ if (this.evoBarInterior.displayWidth <= 0){
         scene.physics.add.collider(cakes, gameBoundaries, cakeWallHit, null, scene)
 
         function cakeBugHit(cakeAmmo, bug){
+            this.evoBarInterior.displayWidth += 30
+            score += 50;
+            scoreText.setText(`${score}`);
             cakeAmmo.destroy()
             bug.destroy()
         }
