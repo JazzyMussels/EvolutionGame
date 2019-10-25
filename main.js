@@ -16,8 +16,6 @@ var config = {
     }
 };
 
-
-
 var game = new Phaser.Game(config);
 var bugs;
 var gameBoundaries;
@@ -88,14 +86,7 @@ this.load.audio('devolve', 'assets/sounds/devolve.mp3')
 
 function create ()
 {
-    
-    //in-game screens
-   
-    // this.intro = this.add.image(1300, 360, 'introscreen')
-    // this.login = this.add.image(1305, 300, 'loginscreen')
-    
-    //  this.restartScreen = this.add.image(1302, 480, 'restartscreen')
-    
+ 
     //soundtrack
     let music = this.sound.add('soundtrack')
     music.setLoop(true);
@@ -169,7 +160,6 @@ function create ()
       eggPlayer = this.physics.add.sprite(100, 653, 'egg')
       eggPlayer.setScale(0.80)
       eggPlayer.setBounce(0)
-      eggPlayer.score = 0
       eggPlayer.setCollideWorldBounds(true)
 
       this.physics.add.collider(eggPlayer, cloudPlatforms)
@@ -286,7 +276,6 @@ function createBug(){
       
       chickenPlayer.setScale(1.2)
       chickenPlayer.setBounce(0);
-      chickenPlayer.score = 0
       chickenPlayer.setCollideWorldBounds(true)
 
       this.physics.add.collider(chickenPlayer, cloudPlatforms)
@@ -329,7 +318,6 @@ function createBug(){
      kingPlayer = this.physics.add.sprite(100, 650, 'king')
      kingPlayer.setScale(0.9)
      kingPlayer.setBounce(0);
-     kingPlayer.score = 0
      kingPlayer.setCollideWorldBounds(true)
 
      this.physics.add.collider(kingPlayer, cloudPlatforms)
@@ -361,7 +349,6 @@ function createBug(){
     //raptor
     raptorPlayer = this.physics.add.sprite(100, 650, 'raptor')
      raptorPlayer.setScale(0.5)
-     raptorPlayer.score = 0
      raptorPlayer.setCollideWorldBounds(true)
 
      this.physics.add.collider(raptorPlayer, cloudPlatforms)
