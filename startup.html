@@ -37,11 +37,24 @@
             width: 178px;
             height: 50.5px;
         }
+        #username_box {
+            position: absolute;
+            top: 67.5vh;
+            
+        }
+        #username {
+            width: 171px;
+            height: 20px;
+        }
     </style>
 </head>
 <body>
     <div id='start_button'></div>
-    <div id='username_box'></div>
+    <div id='username_box'>
+        <form  id= "form">
+            <input id="username" type="text" hidden="true" name="username">
+        </form>
+    </div>
     <a id='submit_box' href='index.html'></a>
     <script>
         let startupScreen = true
@@ -50,6 +63,7 @@
             if (event.target.id === 'start_button' && startupScreen) {
                 startupScreen = false
                 loginPage = true
+                document.querySelector("#username").hidden = false
                 document.body.style.backgroundImage = 'url(assets/login_page.png)'
                 console.log('clicked')
             }
