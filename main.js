@@ -607,7 +607,6 @@ if (activeAvatar.raptor){
             
             raptorPlayer.setVelocityX(0);
             raptorPlayer.anims.play('roarleft', true);
-            raptorPlayer.setVelocityX(-520);
             bugs.children.iterate(function(bug){
                 bug.setVelocityX(0);  
             }) 
@@ -615,7 +614,6 @@ if (activeAvatar.raptor){
         if (lastCursor === "right"){
             raptorPlayer.setVelocityX(0);
             raptorPlayer.anims.play('roarright', true);
-            raptorPlayer.setVelocityX(520);
         }
         bugs.children.iterate(function(bug){
             bug.setVelocityX(0);
