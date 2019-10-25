@@ -16,8 +16,6 @@ var config = {
     }
 };
 
-
-
 var game = new Phaser.Game(config);
 var bugs;
 var gameBoundaries;
@@ -55,7 +53,7 @@ this.load.image('eggscreen', 'assets/egg_screen.png')
 this.load.image('chickenscreen', 'assets/chicken_screen.png')
 this.load.image('raptorscreen', 'assets/raptor_screen.png')
 this.load.image('kingscreen', 'assets/king_screen.png')
-this.load.image('restartscreen', 'assets/restart_screen.png')
+this.load.image('restartscreen', 'assets/startfresh.png')
 
 
 //boundaries and platforms
@@ -88,14 +86,7 @@ this.load.audio('devolve', 'assets/sounds/devolve.mp3')
 
 function create ()
 {
-    
-    //in-game screens
-   
-    // this.intro = this.add.image(1300, 360, 'introscreen')
-    // this.login = this.add.image(1305, 300, 'loginscreen')
-    
-    //  this.restartScreen = this.add.image(1302, 480, 'restartscreen')
-    
+ 
     //soundtrack
     let music = this.sound.add('soundtrack')
     music.setLoop(true);
@@ -169,7 +160,6 @@ function create ()
       eggPlayer = this.physics.add.sprite(100, 653, 'egg')
       eggPlayer.setScale(0.80)
       eggPlayer.setBounce(0)
-      eggPlayer.score = 0
       eggPlayer.setCollideWorldBounds(true)
 
       this.physics.add.collider(eggPlayer, cloudPlatforms)
@@ -286,7 +276,6 @@ function createBug(){
       
       chickenPlayer.setScale(1.2)
       chickenPlayer.setBounce(0);
-      chickenPlayer.score = 0
       chickenPlayer.setCollideWorldBounds(true)
 
       this.physics.add.collider(chickenPlayer, cloudPlatforms)
@@ -329,7 +318,6 @@ function createBug(){
      kingPlayer = this.physics.add.sprite(100, 650, 'king')
      kingPlayer.setScale(0.9)
      kingPlayer.setBounce(0);
-     kingPlayer.score = 0
      kingPlayer.setCollideWorldBounds(true)
 
      this.physics.add.collider(kingPlayer, cloudPlatforms)
@@ -361,8 +349,6 @@ function createBug(){
     //raptor
     raptorPlayer = this.physics.add.sprite(100, 650, 'raptor')
      raptorPlayer.setScale(0.5)
-     raptorPlayer.setBounce(0);
-     raptorPlayer.score = 0
      raptorPlayer.setCollideWorldBounds(true)
 
      this.physics.add.collider(raptorPlayer, cloudPlatforms)
@@ -378,13 +364,13 @@ function createBug(){
 
     this.anims.create({
         key: 'raptorStaticRight',
-        frames: [ { key: 'raptor', frame: 5 } ],
+        frames: [ { key: 'raptor', frame: 7 } ],
         frameRate: 10,
         repeat: -1
     });
     this.anims.create({
         key: 'raptorStaticLeft',
-        frames: [ { key: 'raptor', frame: 2 } ],
+        frames: [ { key: 'raptor', frame: 0 } ],
         frameRate: 10,
         repeat: -1
     });
@@ -496,7 +482,7 @@ function update(){
         else if (activeAvatar.king){
        this.kingScreen = this.add.image(1302, 580, 'kingscreen')
         }
-        scoreText = this.add.text(1283, 20, `${score}`, { fontSize: '41px', fill: '#1df4ff' });
+        scoreText = this.add.text(1216, 20, `${score}`, { fontSize: '41px', fill: '#1df4ff' });
     divLine = this.add.text(1200, 40, '--------', { fontSize: '41px', fill: '#1df4ff' });
         
     //egg
@@ -662,6 +648,7 @@ if (activeAvatar.egg) {
         kingPlayer.setVelocityY(-400);
     }
     }
+
     // raptor
 if (activeAvatar.raptor){
     if (cursors.left.isDown)
@@ -681,7 +668,6 @@ if (activeAvatar.raptor){
 
     else if(cursors.space.isDown){
         scream.play()
-        scream.setLoop(false)
         if (lastCursor === "left"){
             
             raptorPlayer.setVelocityX(0);
@@ -699,6 +685,7 @@ if (activeAvatar.raptor){
             bug.setVelocity(0)
         })
     }
+    //probably source of bug with dino movement
     else if (lastCursor === "left")
     {
         raptorPlayer.setVelocityX(0);
@@ -828,34 +815,35 @@ function eggBugHit(eggPlayer, bug){
         if(bug.body.touching.up || cursors.space.isDown){
             gobble.play()
             squish.play()
-            this.evoBarInterior.displayWidth += 457/7
+            this.evoBarInterior.displayWidth += 65
             score += 50;
             scoreText.setText(`${score}`);
             makeTokens()
             bug.disableBody(true,true)
+            bug.destroy()
+            
         }
         else if (bug.body.touching.left || bug.body.touching.right || bug.body.touching.down){
             levelDown.play()
             touchingObj = bug.body.touching
+            bugHurt(bug, chickenPlayer, touchingObj)
             score -= 10;
             scoreText.setText(`${score}`);
-      bugHurt(bug, chickenPlayer, touchingObj)
-                if (this.evoBarInterior.displayWidth <= 0){
-                        becomeEgg(chickenPlayer)
-                        devolve.play()
-                       
-                     }
             } 
         
         if (this.evoBarInterior.displayWidth >= 457){
-            this.evoBarInterior.displayWidth = 30
-    
+            becomeRaptor(chickenPlayer) 
             activeAvatar.chicken = false
             activeAvatar.raptor = true
-            
-            becomeRaptor(chickenPlayer)    
-            levelUp.play()
+            levelUp.play() 
+            this.evoBarInterior.displayWidth = 30
             }
+            if (this.evoBarInterior.displayWidth <= 0){
+                becomeEgg(chickenPlayer)
+                this.evoBarInterior.displayWidth = 30
+                devolve.play()
+            
+        }
         }
 
         function becomeRaptor(chickenPlayer){
@@ -867,6 +855,11 @@ function eggBugHit(eggPlayer, bug){
         }
 
         function raptorBugHit(raptorPlayer, bug){
+            if (this.evoBarInterior.displayWidth <= 0){
+                becomeEgg(raptorPlayer)
+                devolve.play()
+            
+        }
             if(bug.body.touching.up){
                 squish.play()
                 this.evoBarInterior.displayWidth += 457/10
@@ -881,22 +874,16 @@ function eggBugHit(eggPlayer, bug){
                  score -= 10;
                  scoreText.setText(`${score}`);
              }
-                    if (this.evoBarInterior.displayWidth <= 0){
-                        becomeEgg(raptorPlayer)
-                        devolve.play()
-                    
-                }
-            
-
-            
             if (this.evoBarInterior.displayWidth >= 457){
-                this.evoBarInterior.displayWidth = 30
-    
+                becomeKing(raptorPlayer) 
                 activeAvatar.raptor = false
-                activeAvatar.king = true
-                
-                becomeKing(raptorPlayer)  
+                activeAvatar.king = true 
                 levelUp.play()  
+                this.evoBarInterior.displayWidth = 30
+                
+                
+                
+                
         
                 }
             
