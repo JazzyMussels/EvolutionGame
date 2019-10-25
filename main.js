@@ -13,7 +13,8 @@ var config = {
         preload: preload,
         create: create,
         update: update
-    }
+    },
+    fps: {target: 2}
 };
 
 var game = new Phaser.Game(config);
@@ -241,7 +242,7 @@ else if (activeAvatar.king){
     })
 }
 function createBug(){
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 2; i++) {
 		var x = Phaser.Math.RND.between(0, 900);
         var bug = bugs.create(x, 16, 'bug')
         bug.setCollideWorldBounds(true)
