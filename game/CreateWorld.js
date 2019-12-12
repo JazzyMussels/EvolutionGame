@@ -1,8 +1,8 @@
 function create() {
   //soundtrack
-  // music = this.sound.add("soundtrack");
-  // music.setLoop(true);
-  // music.play();
+  music = this.sound.add("soundtrack");
+  music.setLoop(true);
+  music.play();
 
   //sound-effects
   cake = this.sound.add("cake");
@@ -59,14 +59,6 @@ function create() {
 
   //bottom-left
   cloudPlatforms.create(200, 560, "cloud");
-
-  //top-left
-  //   cloudPlatforms.create(170, 270, 'cloud')
-  //   cloudPlatforms.create(440, 225, 'cloud')
-
-  //top-right
-  // cloudPlatforms.create(780, 240, 'cloud')
-  // cloudPlatforms.create(870, 270, 'cloud')
 
   //egg
   eggPlayer = this.physics.add.sprite(100, 653, "egg");
@@ -254,16 +246,7 @@ function create() {
   this.physics.add.collider(kingPlayer, cloudPlatforms);
   this.physics.add.collider(kingPlayer, gameBoundaries);
 
-  function shootCake(velocity) {
-    var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, "cake");
-        cakeAmmo.setScale(1.0);
-        cakeAmmo.setBounce(0);
-        cakeAmmo.setCollideWorldBounds(true);
-        cakeAmmo.setVelocityX(velocity);
-        setTimeout(() => {
-          cakeAmmo.destroy();
-        }, 1000);
-  }
+
 
   this.anims.create({
     key: "kingleft",
@@ -340,6 +323,7 @@ function create() {
   //  cake ammo
   cakes = this.physics.add.group({
     key: "cake",
+    maxSize: 50,
     setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
   });
   cakes.children.iterate(function(cakeAmmo) {
@@ -347,8 +331,17 @@ function create() {
     cakeAmmo.setBounce(0);
     cakeAmmo.setCollideWorldBounds(true);
     cakeAmmo.destroy();
-    cakeAmmo.fireRate = 5
+    
   });
+
+  shootCake = (velocity) => {
+    var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, "cake");
+        cakeAmmo.setVelocityX(velocity);
+        cakeAmmo.fireRate = 5
+        setTimeout(() => {
+          cakeAmmo.destroy();
+        }, 1000);
+  }
 
   this.physics.add.collider(cakes, cloudPlatforms);
   this.physics.add.collider(cakes, gameBoundaries);
@@ -358,6 +351,7 @@ function create() {
     key: "binary",
     setXY: { x: Phaser.Math.Between(0, 900), y: 0, stepX: 70 }
   });
+  
 
   binaryTokens.children.iterate(function(token) {
     token.setScale(0.3);

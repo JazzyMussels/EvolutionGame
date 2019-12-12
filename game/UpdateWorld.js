@@ -1,6 +1,5 @@
-// this.shootCake = true;
 
-function update() {
+function update(time) {
   if (activeAvatar.restart && activeAvatar.egg) {
     sideBar.setTexture("restartscreen");
   } else if (activeAvatar.egg) {
@@ -100,38 +99,15 @@ function update() {
       kingPlayer.anims.play("kingright", true);
       lastCursor = "right";
     } else if (cursors.space.isDown ) {
-      // && this.shootCake
-      //   this.shootCake = false
-      if (lastCursor === "left") {
-       
+      if (lastCursor === "left" && time > lastFired) {
         kingPlayer.setVelocityX(0);
-
-
-      
-        var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, "cake");
-        cakeAmmo.setScale(1.0);
-        cakeAmmo.setBounce(0);
-        cakeAmmo.setCollideWorldBounds(true);
-        cakeAmmo.setVelocityX(-200);
-        // cakeAmmo.fireRate = 5
-        setTimeout(() => {
-          // this.shootCake = true
-          cakeAmmo.destroy();
-        }, 1000);
-       
+        shootCake(-200)
+        lastFired = time + 500
       }
-      if (lastCursor === "right") {
+      if (lastCursor === "right" && time > lastFired ) {
         kingPlayer.setVelocityX(0);
-        var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, "cake");
-        cakeAmmo.setScale(1.0);
-        cakeAmmo.setBounce(0);
-        cakeAmmo.setCollideWorldBounds(true);
-        cakeAmmo.setVelocityX(200);
-        cakeAmmo.fireRate = 5
-        setTimeout(() => {
-          // this.shootCake = true
-          cakeAmmo.destroy();
-        }, 1000);
+        shootCake(200)
+        lastFired = time + 500
       }
     } else if (lastCursor === "left") {
       kingPlayer.setVelocityX(0);

@@ -19,3 +19,4 @@ var scoreText;
 var cakeFire;
 var devolve;
 var music;
+var lastFired = 0
