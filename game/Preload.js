@@ -38,7 +38,7 @@
      this.load.audio('coins', 'assets/sounds/coins.mp3')
      this.load.audio('eggSound', 'assets/sounds/egg.mp3')
      this.load.audio('gobble', 'assets/sounds/gobble.mp3')
-     this.load.audio('level_down', 'assets/sounds/level_down.mp3')
+     this.load.audio('level_down', 'assets/sounds/ouch.mp3')
      this.load.audio('level_up', 'assets/sounds/level_up.mp3')
      this.load.audio('scream', 'assets/sounds/scream.mp3')
      this.load.audio('squish', 'assets/sounds/squish.mp3')

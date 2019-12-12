@@ -1,3 +1,5 @@
+// this.shootCake = true;
+
 function update() {
   if (activeAvatar.restart && activeAvatar.egg) {
     sideBar.setTexture("restartscreen");
@@ -97,27 +99,37 @@ function update() {
 
       kingPlayer.anims.play("kingright", true);
       lastCursor = "right";
-    } else if (cursors.space.isDown) {
+    } else if (cursors.space.isDown ) {
+      // && this.shootCake
+      //   this.shootCake = false
       if (lastCursor === "left") {
+       
         kingPlayer.setVelocityX(0);
+
+
+      
         var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, "cake");
         cakeAmmo.setScale(1.0);
         cakeAmmo.setBounce(0);
         cakeAmmo.setCollideWorldBounds(true);
         cakeAmmo.setVelocityX(-200);
+        // cakeAmmo.fireRate = 5
         setTimeout(() => {
+          // this.shootCake = true
           cakeAmmo.destroy();
         }, 1000);
+       
       }
       if (lastCursor === "right") {
         kingPlayer.setVelocityX(0);
         var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, "cake");
         cakeAmmo.setScale(1.0);
         cakeAmmo.setBounce(0);
-
         cakeAmmo.setCollideWorldBounds(true);
         cakeAmmo.setVelocityX(200);
+        cakeAmmo.fireRate = 5
         setTimeout(() => {
+          // this.shootCake = true
           cakeAmmo.destroy();
         }, 1000);
       }
@@ -186,7 +198,7 @@ function update() {
   function eggBugHit(eggPlayer, bug) {
     if (bug.body.touching.up) {
       squish.play();
-      this.evoBarInterior.displayWidth += 25;
+      this.evoBarInterior.displayWidth += 45;
       score += 50;
       scoreText.setText(`${score}`);
       makeTokens();
@@ -197,10 +209,15 @@ function update() {
       bug.body.touching.down
     ) {
       levelDown.play();
+      if ( score <= 10) {
+          score = 0
+      }
+      else {
       score -= 10;
       scoreText.setText(`${score}`);
       touchingObj = bug.body.touching;
       bugHurt(bug, eggPlayer, touchingObj);
+      }
     }
 
     if (this.evoBarInterior.displayWidth >= 457) {
@@ -214,9 +231,9 @@ function update() {
 
   function bugHurt(bug, player, touchingObj) {
     if (touchingObj.left) {
-      bug.setVelocityX(190);
+      bug.setVelocityX(220);
     } else if (touchingObj.right) {
-      bug.setVelocityX(-190);
+      bug.setVelocityX(-220);
     } else if (touchingObj.down) {
       bug.setVelocityY(-300);
       setTimeout(() => {
@@ -254,7 +271,7 @@ function update() {
     if (bug.body.touching.up || cursors.space.isDown) {
       gobble.play();
       squish.play();
-      this.evoBarInterior.displayWidth += 25;
+      this.evoBarInterior.displayWidth += 40;
       score += 50;
       scoreText.setText(`${score}`);
       makeTokens();
@@ -295,7 +312,7 @@ function update() {
   function raptorBugHit(raptorPlayer, bug) {
     if (bug.body.touching.up || cursors.space.isDown) {
       squish.play();
-      this.evoBarInterior.displayWidth += 25;
+      this.evoBarInterior.displayWidth += 35;
       score += 50;
       scoreText.setText(`${score}`);
       bug.destroy();
@@ -355,7 +372,7 @@ function update() {
   function kingBugHit(kingPlayer, bug) {
     if (bug.body.touching.up) {
       squish.play();
-      this.evoBarInterior.displayWidth += 25;
+      this.evoBarInterior.displayWidth += 30;
       score += 50;
       scoreText.setText(`${score}`);
       bug.destroy();

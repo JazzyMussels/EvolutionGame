@@ -1,8 +1,8 @@
 function create() {
   //soundtrack
-//   let music = this.sound.add("soundtrack");
-//   music.setLoop(true);
-//   music.play();
+  // music = this.sound.add("soundtrack");
+  // music.setLoop(true);
+  // music.play();
 
   //sound-effects
   cake = this.sound.add("cake");
@@ -19,9 +19,7 @@ function create() {
   this.background = this.add.image(0, 0, "background");
   this.background.setOrigin(0, 0);
 
-  // scorecard
-  this.scoreCard = this.add.image(1020, 40, "scorecard");
-  this.scoreCard.setScale(0.6);
+ 
 
   // evolve-bar
   this.evoBarShell = this.add.image(295, 40, "outer_shell");
@@ -32,11 +30,15 @@ function create() {
 
 
 
-   sideBar = this.add.image(1305, 555, "eggscreen");
-   scoreText = this.add.text(1216, 20, `${score}`, {
+   sideBar = this.add.image(1305, 360, "eggscreen");
+   scoreText = this.add.text(1233, 90, `${score}`, {
     fontSize: "41px",
     fill: "#1df4ff"
     });
+
+     // scorecard
+  this.scoreCard = this.add.image(1290, 43, "scorecard");
+  this.scoreCard.setScale(0.6);
 
   // boundaries
 
@@ -134,33 +136,33 @@ function create() {
     bug.setCollideWorldBounds(true);
     bug.setScale(0.5, 0.5);
     bug.setBounce(1, 0);
-    bug.setVelocityX(-190);
+    bug.setVelocityX(-220);
   });
 
   if (activeAvatar.egg) {
-    this.time.addEvent({
-      delay: 5000,
-      callback: createBug, // End callback for adding enemies
-      callbackScope: this,
-      loop: true
-    });
-  } else if (activeAvatar.chicken) {
-    this.time.addEvent({
-      delay: 4000,
-      callback: createBug, // End callback for adding enemies
-      callbackScope: this,
-      loop: true
-    });
-  } else if (activeAvatar.raptor) {
     this.time.addEvent({
       delay: 3000,
       callback: createBug, // End callback for adding enemies
       callbackScope: this,
       loop: true
     });
-  } else if (activeAvatar.king) {
+  } else if (activeAvatar.chicken) {
+    this.time.addEvent({
+      delay: 2000,
+      callback: createBug, // End callback for adding enemies
+      callbackScope: this,
+      loop: true
+    });
+  } else if (activeAvatar.raptor) {
     this.time.addEvent({
       delay: 1000,
+      callback: createBug, // End callback for adding enemies
+      callbackScope: this,
+      loop: true
+    });
+  } else if (activeAvatar.king) {
+    this.time.addEvent({
+      delay: 700,
       callback: createBug, // End callback for adding enemies
       callbackScope: this,
       loop: true
@@ -252,6 +254,17 @@ function create() {
   this.physics.add.collider(kingPlayer, cloudPlatforms);
   this.physics.add.collider(kingPlayer, gameBoundaries);
 
+  function shootCake(velocity) {
+    var cakeAmmo = cakes.create(kingPlayer.x, kingPlayer.y, "cake");
+        cakeAmmo.setScale(1.0);
+        cakeAmmo.setBounce(0);
+        cakeAmmo.setCollideWorldBounds(true);
+        cakeAmmo.setVelocityX(velocity);
+        setTimeout(() => {
+          cakeAmmo.destroy();
+        }, 1000);
+  }
+
   this.anims.create({
     key: "kingleft",
     frames: this.anims.generateFrameNumbers("king", { start: 0, end: 0 }),
@@ -334,6 +347,7 @@ function create() {
     cakeAmmo.setBounce(0);
     cakeAmmo.setCollideWorldBounds(true);
     cakeAmmo.destroy();
+    cakeAmmo.fireRate = 5
   });
 
   this.physics.add.collider(cakes, cloudPlatforms);

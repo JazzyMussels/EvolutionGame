@@ -18,3 +18,4 @@ var touchingObj;
 var scoreText;
 var cakeFire;
 var devolve;
+var music;
