@@ -14,6 +14,8 @@ Then, simply run the following Docker command after cloning the repo
 
 ``` docker compose up ```
 
+You can also play by clicking [here](https://evolution-game-js.herokuapp.com/)
+
 
 
 
