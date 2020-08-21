@@ -16,6 +16,9 @@ Then, simply run the following Docker command after cloning the repo
 
 You can also play by clicking [here](https://evolution-game-js.herokuapp.com/)
 
-
+## Controls
+* You can move your character using the left and right arrow keys
+* pressing the up arrow key to jump
+* As you grow in levels, hittin spacebar will allow you to use a special ability
 
 
